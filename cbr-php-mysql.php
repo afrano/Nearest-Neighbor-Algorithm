@@ -92,23 +92,30 @@ include("../koneksi.php");
 
                                 $querybasiskasus = mysql_query("SELECT * FROM basis_kasus ORDER BY no_kasus, id_penyakit, id_gejala");
                                 $no_kasus = "";
+
+
+
                                 while ($databasiskasus = mysql_fetch_array($querybasiskasus)) {
                                     $querypenyakit = mysql_query("SELECT * FROM penyakit WHERE id_penyakit = '$databasiskasus[id_penyakit]'");
                                     $datapenyakit = mysql_fetch_array($querypenyakit);
                                     $querygejala = mysql_query("SELECT * FROM gejala WHERE id_gejala = '$databasiskasus[id_gejala]'");
                                     $datagejala = mysql_fetch_array($querygejala);
 
-                                    $ka = mysql_query("SELECT SUM( g.bobot ) as bobot FROM basis_kasus b, gejala g WHERE b.id_gejala = g.id_gejala GROUP BY b.no_kasus");
+                                    $databobot = mysql_query("SELECT * FROM basis_kasus WHERE id_gejala = '$databasiskasus[id_gejala]'");
+                                    $dabobot = mysql_fetch_array($databobot);
 
 
-                                    $hitung = mysql_query("SELECT nama_gejala , sum(bobot) FROM gejala WHERE id_gejala = '$databasiskasus[id_gejala]' GROUP BY nama_gejala");
-                                    $hasilhitung = mysql_fetch_array($hitung);
+                                    $ka = mysql_query("SELECT no_kasus, SUM(bobot) AS total FROM basis_kasus GROUP BY no_kasus");
+
+
+                                    // $hitung = mysql_query("SELECT g.nama_gejala , sum(bk.bobot) FROM gejala g, basis_kasus bk WHERE g.id_gejala = '$databasiskasus[id_gejala]' GROUP BY g.nama_gejala");
+                                    $hasilhitung = mysql_fetch_array($ka);
                                     ?>
 
                                     <?php
                                     // -----------------------------------------------------------
-                                    $qry_jumlah_b = mysql_query("SELECT SUM( g.bobot )FROM basis_kasus b, gejala g WHERE b.id_gejala = g.id_gejala GROUP BY b.no_kasus");
-                                    $data_b = mysql_fetch_array($qry_jumlah_b);
+                                    // $qry_jumlah_b = mysql_query("SELECT SUM( g.bobot )FROM basis_kasus b, gejala g WHERE b.id_gejala = g.id_gejala GROUP BY b.no_kasus");
+                                    $data_b = mysql_fetch_array($ka);
                                     ?>
 
 
@@ -125,7 +132,7 @@ include("../koneksi.php");
                                         }
                                         ?>
                                         <td bgcolor="#FFFFFF"><?php echo $datagejala['nama_gejala']; ?></td>
-                                        <td bgcolor="#FFFFFF"><?php echo $datagejala['bobot']; ?></td>
+                                        <td bgcolor="#FFFFFF"><?php echo $dabobot['bobot']; ?></td>
                                         <?php
                                         // $nilai[] = $datahitung['bobot'];
                                         //$totalnya = array_sum($nilai);
@@ -151,7 +158,7 @@ include("../koneksi.php");
                                         <tr>
                                             <td bgcolor="#FFFFFF"> 
                                                 <?php echo $datagejala['nama_gejala']; ?>
-                                                <?php echo $datagejala['bobot']; ?>
+
                                             </td>
                                         </tr>
                                         <?php
@@ -187,23 +194,28 @@ include("../koneksi.php");
                             $nilai_hasil = array();
 
                             $i = 0;
-                            $querykasus = mysql_query("SELECT no_kasus FROM basis_kasus GROUP BY no_kasus ORDER BY no_kasus ASC");
+                            $querykasus = mysql_query("SELECT no_kasus, SUM( bobot ) AS total FROM basis_kasus GROUP BY no_kasus ORDER BY no_kasus ASC");
+
+                            $ini = mysql_query("SELECT no_kasus, SUM( bobot ) AS total FROM basis_kasus GROUP BY no_kasus");
+                            $hitungbobotbe = mysql_fetch_array($ini);
+
                             while ($datakasus = mysql_fetch_array($querykasus)) {
                                 $no_kasus_hasil[$i] = $datakasus['no_kasus'];
                                 $jml_gejala_dipilih = 0;
                                 $jml_gejala_kasus = 0;
                                 $jml_gejala_cocok = 0;
-                                $tampung = 0;
+                                $bobotcocok = 0;
 
                                 $querygejala = mysql_query("SELECT * FROM gejala ORDER BY id_gejala ASC");
                                 while ($datagejala = mysql_fetch_array($querygejala)) {
                                     if (@$_POST['gejala' . $datagejala['id_gejala']] == 'true') {
 
                                         $jml_gejala_dipilih++;
+
                                         // SELECT bk.no_kasus, sum(g.bobot) FROM basis_kasus bk, gejala g WHERE bk.no_kasus = '2' and g.id_gejala = bk.id_gejala
                                         //$querybasiskasus = mysql_query("SELECT * , sum(g.bobot) FROM basis_kasus WHERE no_kasus = '$datakasus[no_kasus]'");
                                         $menghitungbobot = mysql_query("SELECT bk.no_kasus, sum(g.bobot) as total FROM basis_kasus bk, gejala g WHERE bk.no_kasus = '$datakasus[no_kasus]' and g.id_gejala = bk.id_gejala");
-                                        $totalhasil = mysql_fetch_array($menghitungbobot);
+                                        $totalhasil = mysql_fetch_array($ka);
                                         $querybasiskasus = mysql_query("SELECT * FROM basis_kasus bk, gejala g WHERE bk.no_kasus = '$datakasus[no_kasus]' and g.id_gejala = bk.id_gejala");
                                         $jml_gejala_kasus = 0;
                                         while ($databasiskasus = mysql_fetch_array($querybasiskasus)) {
@@ -211,8 +223,8 @@ include("../koneksi.php");
                                             // apabila id gejala sama dengan yang dipilih
                                             if ($datagejala['id_gejala'] == $databasiskasus['id_gejala']) {
                                                 // ambil bobot untuk gejala tersebut
-                                                // tampung = [bobot_kasus] ++
-                                                $tampung = $datagejala['bobot'] ++;
+
+
                                                 $jml_gejala_cocok++;
                                             }
                                         }
@@ -224,7 +236,7 @@ include("../koneksi.php");
                                 if ($pembagi == 0) {
                                     $hasil = 0;
                                 } else {
-                                    $hasil = $jml_gejala_cocok / $totalhasil['total'];
+                                    $hasil = $jml_gejala_cocok / $hasilhitung['total'];
                                 }
                                 $nilai_hasil[$i] = $hasil;
 
@@ -242,10 +254,10 @@ include("../koneksi.php");
 
                                 //echo $datakasus['no_kasus']." ".$namapenyakit." = ".$jml_gejala_cocok." / ".$pembagi." = ".$hasil."<br/>";
                                 echo "<td bgcolor=\"#FFFFFF\"><strong>" . $datakasus['no_kasus'] . "</strong></td>";
-                                echo "<td bgcolor=\"#FFFFFF\">" . $jml_gejala_cocok . " gejala</td>";
+                                echo "<td bgcolor=\"#FFFFFF\"><strong>" . $jml_gejala_cocok . " gejala</strong></td>";
                                 // lakukan pembobotan disini bukan menghitun gejala
-                                echo "<td bgcolor=\"#FFFFFF\">" . $jml_gejala_cocok . "</td>";
-                                echo "<td bgcolor=\"#FFFFFF\"><strong>" . $totalhasil['total'] . "</strong></td>";
+                                echo "<td bgcolor=\"#FFFFFF\">" . $bobotcocok . "</td>";
+                                echo "<td bgcolor=\"#FFFFFF\"><strong>" . $datakasus['total'] . "</strong></td>";
                                 echo "<td bgcolor=\"#FFFFFF\"><strong>" . $jml_gejala_kasus . "</strong></td>"; // hitung total bobot
                                 echo "<td bgcolor=\"#FFFFFF\"><strong>" . $jml_gejala_dipilih . "</strong></td>";
                                 echo "<td bgcolor=\"#FFFFFF\"><strong>" . $totalhasil['total'] . "</strong></td>";
