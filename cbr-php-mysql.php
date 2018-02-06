@@ -95,7 +95,6 @@ include("../koneksi.php");
                                 $no_kasus = "";
 
 
-
                                 while ($databasiskasus = mysql_fetch_array($querybasiskasus)) {
                                     $querypenyakit = mysql_query("SELECT * FROM penyakit WHERE id_penyakit = '$databasiskasus[id_penyakit]'");
                                     $datapenyakit = mysql_fetch_array($querypenyakit);
@@ -153,13 +152,13 @@ include("../koneksi.php");
                             <table width="300" border="0" cellpadding="5" cellspacing="1" bgcolor="#000099">
                                 <?php
                                 $querygejala = mysql_query("SELECT * FROM gejala ORDER BY id_gejala ASC");
+
                                 while ($datagejala = mysql_fetch_array($querygejala)) {
                                     if (@$_POST['gejala' . $datagejala['id_gejala']] == 'true') {
                                         ?>        
                                         <tr>
                                             <td bgcolor="#FFFFFF"> 
                                                 <?php echo $datagejala['nama_gejala']; ?>
-
                                             </td>
                                         </tr>
                                         <?php
@@ -197,8 +196,8 @@ include("../koneksi.php");
                             $i = 0;
                             $querykasus = mysql_query("SELECT no_kasus, SUM( bobot ) AS total FROM basis_kasus GROUP BY no_kasus ORDER BY no_kasus ASC");
 
-                         //   $ini = mysql_query("SELECT no_kasus, SUM( bobot ) AS total FROM basis_kasus GROUP BY no_kasus");
-                           // $hitungbobotbe = mysql_fetch_array($ini);
+                            //   $ini = mysql_query("SELECT no_kasus, SUM( bobot ) AS total FROM basis_kasus GROUP BY no_kasus");
+                            // $hitungbobotbe = mysql_fetch_array($ini);
 
                             while ($datakasus = mysql_fetch_array($querykasus)) {
                                 $no_kasus_hasil[$i] = $datakasus['no_kasus'];
@@ -216,7 +215,7 @@ include("../koneksi.php");
                                         // SELECT bk.no_kasus, sum(g.bobot) FROM basis_kasus bk, gejala g WHERE bk.no_kasus = '2' and g.id_gejala = bk.id_gejala
                                         //$querybasiskasus = mysql_query("SELECT * , sum(g.bobot) FROM basis_kasus WHERE no_kasus = '$datakasus[no_kasus]'");
                                         $menghitungbobot = mysql_query("SELECT bk.no_kasus, sum(g.bobot) as total FROM basis_kasus bk, gejala g WHERE bk.no_kasus = '$datakasus[no_kasus]' and g.id_gejala = bk.id_gejala");
-                                  //      $totalhasil = mysql_fetch_array($ka);
+                                        //      $totalhasil = mysql_fetch_array($ka);
                                         $querybasiskasus = mysql_query("SELECT * FROM basis_kasus bk, gejala g WHERE bk.no_kasus = '$datakasus[no_kasus]' and g.id_gejala = bk.id_gejala");
                                         $jml_gejala_kasus = 0;
                                         while ($databasiskasus = mysql_fetch_array($querybasiskasus)) {
