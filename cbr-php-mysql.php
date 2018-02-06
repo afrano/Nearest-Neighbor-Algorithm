@@ -1,5 +1,6 @@
 <?php
 include("../koneksi.php");
+// aku mencintaimu dengan sepenuh hati, hati yang tak bernyali VP
 ?>
 
 <html >
@@ -196,8 +197,8 @@ include("../koneksi.php");
                             $i = 0;
                             $querykasus = mysql_query("SELECT no_kasus, SUM( bobot ) AS total FROM basis_kasus GROUP BY no_kasus ORDER BY no_kasus ASC");
 
-                            $ini = mysql_query("SELECT no_kasus, SUM( bobot ) AS total FROM basis_kasus GROUP BY no_kasus");
-                            $hitungbobotbe = mysql_fetch_array($ini);
+                         //   $ini = mysql_query("SELECT no_kasus, SUM( bobot ) AS total FROM basis_kasus GROUP BY no_kasus");
+                           // $hitungbobotbe = mysql_fetch_array($ini);
 
                             while ($datakasus = mysql_fetch_array($querykasus)) {
                                 $no_kasus_hasil[$i] = $datakasus['no_kasus'];
@@ -215,7 +216,7 @@ include("../koneksi.php");
                                         // SELECT bk.no_kasus, sum(g.bobot) FROM basis_kasus bk, gejala g WHERE bk.no_kasus = '2' and g.id_gejala = bk.id_gejala
                                         //$querybasiskasus = mysql_query("SELECT * , sum(g.bobot) FROM basis_kasus WHERE no_kasus = '$datakasus[no_kasus]'");
                                         $menghitungbobot = mysql_query("SELECT bk.no_kasus, sum(g.bobot) as total FROM basis_kasus bk, gejala g WHERE bk.no_kasus = '$datakasus[no_kasus]' and g.id_gejala = bk.id_gejala");
-                                        $totalhasil = mysql_fetch_array($ka);
+                                  //      $totalhasil = mysql_fetch_array($ka);
                                         $querybasiskasus = mysql_query("SELECT * FROM basis_kasus bk, gejala g WHERE bk.no_kasus = '$datakasus[no_kasus]' and g.id_gejala = bk.id_gejala");
                                         $jml_gejala_kasus = 0;
                                         while ($databasiskasus = mysql_fetch_array($querybasiskasus)) {
@@ -236,7 +237,7 @@ include("../koneksi.php");
                                 if ($pembagi == 0) {
                                     $hasil = 0;
                                 } else {
-                                    $hasil = $jml_gejala_cocok / $hasilhitung['total'];
+                                    $hasil = $jml_gejala_cocok / $datakasus['total'];
                                 }
                                 $nilai_hasil[$i] = $hasil;
 
@@ -260,8 +261,8 @@ include("../koneksi.php");
                                 echo "<td bgcolor=\"#FFFFFF\"><strong>" . $datakasus['total'] . "</strong></td>";
                                 echo "<td bgcolor=\"#FFFFFF\"><strong>" . $jml_gejala_kasus . "</strong></td>"; // hitung total bobot
                                 echo "<td bgcolor=\"#FFFFFF\"><strong>" . $jml_gejala_dipilih . "</strong></td>";
-                                echo "<td bgcolor=\"#FFFFFF\"><strong>" . $totalhasil['total'] . "</strong></td>";
-                                echo "<td bgcolor=\"#FFFFFF\">" . $jml_gejala_cocok . " /<strong>" . $totalhasil['total'] . "</strong> = " . $hasil . "</td>";
+                                echo "<td bgcolor=\"#FFFFFF\"><strong>" . $datakasus['total'] . "</strong></td>";
+                                echo "<td bgcolor=\"#FFFFFF\">" . $jml_gejala_cocok . " /<strong>" . $datakasus['total'] . "</strong> = " . $hasil . "</td>";
                                 echo "</tr>";
 
                                 $i++;
