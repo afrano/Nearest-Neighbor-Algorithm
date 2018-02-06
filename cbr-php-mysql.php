@@ -132,7 +132,7 @@ include("../koneksi.php");
                                         }
                                         ?>
                                         <td bgcolor="#FFFFFF"><?php echo $datagejala['nama_gejala']; ?></td>
-                                        <td bgcolor="#FFFFFF"><?php echo $dabobot['bobot']; ?></td>
+                                        <td bgcolor="#FFFFFF"><?php echo $databasiskasus[bobot]; ?></td>
                                         <?php
                                         // $nilai[] = $datahitung['bobot'];
                                         //$totalnya = array_sum($nilai);
