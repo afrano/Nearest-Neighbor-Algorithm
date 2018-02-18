@@ -79,7 +79,7 @@ include("../koneksi.php");
                     } else {
                         ?>
                         <br/><br/> <strong>---------------------------------------------------------------------------------------------------------------------</strong>   <br/><br/>
-                        <div id="perhitungan" style="display:none;">
+                        <div id="perhitungan" > 
                             <br/><br/>Database Baisi Kasus :<br/><br/>
                             <table width="700" border="0" cellpadding="5" cellspacing="1" bgcolor="#000099">
                                 <tr>
@@ -164,8 +164,6 @@ include("../koneksi.php");
                                         <?php
                                     }
                                 }
-
-
                                 //------------------------------------------------------------------------------------------------------------------------
                                 ?>
                             </table> 
@@ -212,6 +210,8 @@ include("../koneksi.php");
 
                                         $jml_gejala_dipilih++;
 
+// cari disini                          //////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
                                         // SELECT bk.no_kasus, sum(g.bobot) FROM basis_kasus bk, gejala g WHERE bk.no_kasus = '2' and g.id_gejala = bk.id_gejala
                                         //$querybasiskasus = mysql_query("SELECT * , sum(g.bobot) FROM basis_kasus WHERE no_kasus = '$datakasus[no_kasus]'");
                                         $menghitungbobot = mysql_query("SELECT bk.no_kasus, sum(g.bobot) as total FROM basis_kasus bk, gejala g WHERE bk.no_kasus = '$datakasus[no_kasus]' and g.id_gejala = bk.id_gejala");
@@ -223,9 +223,18 @@ include("../koneksi.php");
                                             // apabila id gejala sama dengan yang dipilih
                                             if ($datagejala['id_gejala'] == $databasiskasus['id_gejala']) {
                                                 // ambil bobot untuk gejala tersebut
-
-
                                                 $jml_gejala_cocok++;
+
+//                                                for ($i = 0; $i < $jml_gejala_cocok; $i++) {
+//                                                    $bot = $databasiskasus['bobot'];
+//                                                }
+                                                $tobot = mysql_query("SELECT no_kasus, SUM( bobot ) AS total FROM basis_kasus WHERE id_gejala = $datagejala[id_gejala] GROUP BY no_kasus ORDER BY no_kasus ASC ");
+                                                while ($hibo = mysql_fetch_array($tobot)) {
+                                                    echo 'bobot : ' . $hibo[total] . ' kasus no ' . $hibo[no_kasus] . '<br>';
+                                              //      echo "<pre>".print_r($tobot,6)."</pre>";exit;
+                                                  
+                                                } //echo '<br> boooooooooo '.$hibo[total];
+
                                             }
                                         }
                                     }
@@ -236,6 +245,7 @@ include("../koneksi.php");
                                 if ($pembagi == 0) {
                                     $hasil = 0;
                                 } else {
+
                                     $hasil = $jml_gejala_cocok / $datakasus['total'];
                                 }
                                 $nilai_hasil[$i] = $hasil;
@@ -256,7 +266,11 @@ include("../koneksi.php");
                                 echo "<td bgcolor=\"#FFFFFF\"><strong>" . $datakasus['no_kasus'] . "</strong></td>";
                                 echo "<td bgcolor=\"#FFFFFF\"><strong>" . $jml_gejala_cocok . " gejala</strong></td>";
                                 // lakukan pembobotan disini bukan menghitun gejala
-                                echo "<td bgcolor=\"#FFFFFF\">" . $bobotcocok . "</td>";
+
+                                echo "<td bgcolor=\"#FFFFFF\">" . $bot . "</td>";
+
+
+
                                 echo "<td bgcolor=\"#FFFFFF\"><strong>" . $datakasus['total'] . "</strong></td>";
                                 echo "<td bgcolor=\"#FFFFFF\"><strong>" . $jml_gejala_kasus . "</strong></td>"; // hitung total bobot
                                 echo "<td bgcolor=\"#FFFFFF\"><strong>" . $jml_gejala_dipilih . "</strong></td>";
